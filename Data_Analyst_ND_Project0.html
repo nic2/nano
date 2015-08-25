@@ -243,7 +243,7 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[2]:</div>
+<div class="prompt input_prompt">In&nbsp;[5]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span>
@@ -260,7 +260,7 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[3]:</div>
+<div class="prompt input_prompt">In&nbsp;[6]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span class="n">path</span> <span class="o">=</span> <span class="s">r&#39;~/Downloads/chopstick-effectiveness.csv&#39;</span>
@@ -279,7 +279,7 @@ div#notebook {
 <div class="output">
 
 
-<div class="output_area"><div class="prompt output_prompt">Out[3]:</div>
+<div class="output_area"><div class="prompt output_prompt">Out[6]:</div>
 
 <div class="output_html rendered_html output_subarea output_execute_result">
 <div>
@@ -683,7 +683,7 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[4]:</div>
+<div class="prompt input_prompt">In&nbsp;[7]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span class="n">dataFrame</span><span class="p">[</span><span class="s">&#39;Food.Pinching.Efficiency&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
@@ -697,7 +697,7 @@ div#notebook {
 <div class="output">
 
 
-<div class="output_area"><div class="prompt output_prompt">Out[4]:</div>
+<div class="output_area"><div class="prompt output_prompt">Out[7]:</div>
 
 
 <div class="output_text output_subarea output_execute_result">
@@ -722,7 +722,7 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[10]:</div>
+<div class="prompt input_prompt">In&nbsp;[8]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span class="n">meansByChopstickLength</span> <span class="o">=</span> <span class="n">dataFrame</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s">&#39;Chopstick.Length&#39;</span><span class="p">)[</span><span class="s">&#39;Food.Pinching.Efficiency&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
@@ -739,7 +739,7 @@ div#notebook {
 <div class="output">
 
 
-<div class="output_area"><div class="prompt output_prompt">Out[10]:</div>
+<div class="output_area"><div class="prompt output_prompt">Out[8]:</div>
 
 <div class="output_html rendered_html output_subarea output_execute_result">
 <div>
@@ -798,13 +798,14 @@ div#notebook {
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h4 id="5.-Which-chopstick-length-performed-the-best-for-the-group-of-thirty-one-male-junior-college-students?">5. Which chopstick length performed the best for the group of thirty-one male junior college students?<a class="anchor-link" href="#5.-Which-chopstick-length-performed-the-best-for-the-group-of-thirty-one-male-junior-college-students?">&#182;</a></h4>
+<h4 id="5.-Which-chopstick-length-performed-the-best-for-the-group-of-thirty-one-male-junior-college-students?">5. Which chopstick length performed the best for the group of thirty-one male junior college students?<a class="anchor-link" href="#5.-Which-chopstick-length-performed-the-best-for-the-group-of-thirty-one-male-junior-college-students?">&#182;</a></h4><p>the 240mm chopstick length</p>
+
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[11]:</div>
+<div class="prompt input_prompt">In&nbsp;[9]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span class="c"># Causes plots to display within the notebook rather than in a new window</span>
@@ -1033,21 +1034,102 @@ RU5ErkJggg==
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h4 id="6.-Based-on-the-scatterplot-created-from-the-code-above,-interpret-the-relationship-you-see.-What-do-you-notice?">6. Based on the scatterplot created from the code above, interpret the relationship you see. What do you notice?<a class="anchor-link" href="#6.-Based-on-the-scatterplot-created-from-the-code-above,-interpret-the-relationship-you-see.-What-do-you-notice?">&#182;</a></h4><p>There is no correlation between the chopstick length and the efficiency.</p>
+<h4 id="6.-Based-on-the-scatterplot-created-from-the-code-above,-interpret-the-relationship-you-see.-What-do-you-notice?">6. Based on the scatterplot created from the code above, interpret the relationship you see. What do you notice?<a class="anchor-link" href="#6.-Based-on-the-scatterplot-created-from-the-code-above,-interpret-the-relationship-you-see.-What-do-you-notice?">&#182;</a></h4><p>The scatterplot shows a positive linear relation for 180mm to 240mm. For higher values one can see a negative relation though not strictly negative. So it reaches its peak at 240mm.</p>
 
 </div>
 </div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[71]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span class="c"># the study is a within-subject design where each participant is given chopsticks of different lengths</span>
+<span class="c"># so we have dependant samples and can use a 1-sample t-test </span>
+<span class="c"># Test the to 2 nearest means above and below (210mm, 300mm)</span>
+<span class="c"># H_0: x_240 - x_210 &lt;= 0, H_A: x_240 - x_210 &gt; 0</span>
+<span class="c"># H_0: x_240 - x_300 &lt;= 0, H_A: x_240 - x_300 &gt; 0</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">division</span>
+<span class="kn">import</span> <span class="nn">math</span>
+
+<span class="k">def</span> <span class="nf">t_statistic</span><span class="p">(</span><span class="n">x_d</span><span class="p">,</span> <span class="n">se</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">x_d</span> <span class="o">/</span> <span class="n">se</span>
+
+<span class="k">def</span> <span class="nf">standard_error</span><span class="p">(</span><span class="n">grouped</span><span class="p">,</span> <span class="n">group1</span><span class="p">,</span> <span class="n">group2</span><span class="p">):</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">grouped</span><span class="o">.</span><span class="n">get_group</span><span class="p">(</span><span class="n">group1</span><span class="p">))</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">n</span><span class="o">-</span><span class="mi">1</span>
+    <span class="n">s_D</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="nb">sum</span><span class="p">([</span><span class="nb">pow</span><span class="p">(</span><span class="n">a</span><span class="o">-</span><span class="n">b</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span> <span class="k">for</span> <span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">grouped</span><span class="o">.</span><span class="n">get_group</span><span class="p">(</span><span class="n">group1</span><span class="p">),</span> <span class="n">grouped</span><span class="o">.</span><span class="n">get_group</span><span class="p">(</span><span class="n">group2</span><span class="p">))])</span> <span class="o">/</span> <span class="n">df</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">s_D</span> <span class="o">/</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+
+
+
+<span class="n">x_240</span> <span class="o">=</span> <span class="n">meansByChopstickLength</span><span class="p">[</span><span class="s">&#39;Food.Pinching.Efficiency&#39;</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span>
+<span class="n">x_300</span> <span class="o">=</span> <span class="n">meansByChopstickLength</span><span class="p">[</span><span class="s">&#39;Food.Pinching.Efficiency&#39;</span><span class="p">][</span><span class="mi">4</span><span class="p">]</span>
+<span class="n">x_210</span> <span class="o">=</span> <span class="n">meansByChopstickLength</span><span class="p">[</span><span class="s">&#39;Food.Pinching.Efficiency&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+
+<span class="n">grouped</span> <span class="o">=</span> <span class="n">dataFrame</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s">&#39;Chopstick.Length&#39;</span><span class="p">)[</span><span class="s">&#39;Food.Pinching.Efficiency&#39;</span><span class="p">]</span>
+
+<span class="n">SE_210</span> <span class="o">=</span> <span class="n">standard_error</span><span class="p">(</span><span class="n">grouped</span><span class="p">,</span> <span class="mi">240</span><span class="p">,</span> <span class="mi">210</span><span class="p">)</span>
+<span class="n">SE_300</span> <span class="o">=</span> <span class="n">standard_error</span><span class="p">(</span><span class="n">grouped</span><span class="p">,</span> <span class="mi">240</span><span class="p">,</span> <span class="mi">300</span><span class="p">)</span>
+                                                                                            
+<span class="n">t_statistic_210</span> <span class="o">=</span> <span class="n">t_statistic</span><span class="p">(</span><span class="n">x_240</span><span class="o">-</span><span class="n">x_210</span><span class="p">,</span> <span class="n">SE_210</span><span class="p">)</span> 
+<span class="n">t_statistic_300</span> <span class="o">=</span> <span class="n">t_statistic</span><span class="p">(</span><span class="n">x_240</span><span class="o">-</span><span class="n">x_300</span><span class="p">,</span> <span class="n">SE_300</span><span class="p">)</span>
+
+<span class="c"># alpha level 0.05 and df = 29 for one-tailed test</span>
+<span class="n">t_critical</span> <span class="o">=</span> <span class="mf">1.699</span>
+
+<span class="n">t_statistic_300</span> <span class="o">&gt;</span> <span class="n">t_critical</span> <span class="c"># is significant for chopsticks greater than 240 </span>
+<span class="n">t_statistic_210</span> <span class="o">&gt;</span> <span class="n">t_critical</span> <span class="c"># not significant for chopsticks of length 210</span>
+
+<span class="c"># H_0: x_240 - x_210 &lt;= 0, H_A: x_240 - x_210 &gt; 0 --&gt; reject H_0</span>
+<span class="c"># H_0: x_240 - x_300 &lt;= 0, H_A: x_240 - x_300 &gt; 0 --&gt; retain H_0</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area"><div class="prompt output_prompt">Out[71]:</div>
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>False</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
 </div>
 <div class="cell border-box-sizing text_cell rendered">
 <div class="prompt input_prompt">
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="In-the-abstract-the-researchers-stated-that-their-results-showed-food-pinching-performance-was-significantly-affected-by-the-length-of-the-chopsticks,-and-that-chopsticks-of-about-240-mm-long-were-optimal-for-adults.">In the abstract the researchers stated that their results showed food-pinching performance was significantly affected by the length of the chopsticks, and that chopsticks of about 240 mm long were optimal for adults.<a class="anchor-link" href="#In-the-abstract-the-researchers-stated-that-their-results-showed-food-pinching-performance-was-significantly-affected-by-the-length-of-the-chopsticks,-and-that-chopsticks-of-about-240-mm-long-were-optimal-for-adults.">&#182;</a></h3><h4 id="7a.-Based-on-the-data-you-have-analyzed,-do-you-agree-with-the-claim?">7a. Based on the data you have analyzed, do you agree with the claim?<a class="anchor-link" href="#7a.-Based-on-the-data-you-have-analyzed,-do-you-agree-with-the-claim?">&#182;</a></h4><p>No</p>
-<h4 id="7b.-Why?">7b. Why?<a class="anchor-link" href="#7b.-Why?">&#182;</a></h4><p>It is correct that the mean for 240mm chopsticks shows the best performance, then it gets worse for longer ones. But then for even longer ones it gets better again. So you cannot find a clear correlation between chopstick length and PPPC. Furthermore the averages a pretty close together (about 1-2 nuts), so performance gained by 240mm chopstick is pretty small overall.</p>
+<h3 id="In-the-abstract-the-researchers-stated-that-their-results-showed-food-pinching-performance-was-significantly-affected-by-the-length-of-the-chopsticks,-and-that-chopsticks-of-about-240-mm-long-were-optimal-for-adults.">In the abstract the researchers stated that their results showed food-pinching performance was significantly affected by the length of the chopsticks, and that chopsticks of about 240 mm long were optimal for adults.<a class="anchor-link" href="#In-the-abstract-the-researchers-stated-that-their-results-showed-food-pinching-performance-was-significantly-affected-by-the-length-of-the-chopsticks,-and-that-chopsticks-of-about-240-mm-long-were-optimal-for-adults.">&#182;</a></h3><h4 id="7a.-Based-on-the-data-you-have-analyzed,-do-you-agree-with-the-claim?">7a. Based on the data you have analyzed, do you agree with the claim?<a class="anchor-link" href="#7a.-Based-on-the-data-you-have-analyzed,-do-you-agree-with-the-claim?">&#182;</a></h4><p>Partly. I would say chopsticks of length 240mm or 210mm are optimal for adults.</p>
+<h4 id="7b.-Why?">7b. Why?<a class="anchor-link" href="#7b.-Why?">&#182;</a></h4><p>Because the t-test shows that for longer chopsticks the performance with 240mm is significantly higher.
+However, for 210mm chopsticks the performance is not significantly worse than with 240mm.</p>
 
 </div>
 </div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre> 
+</pre></div>
+
+</div>
+</div>
+</div>
+
 </div>
     </div>
   </div>
