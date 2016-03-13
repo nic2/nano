@@ -456,9 +456,12 @@ ggplot(aes(x=interest_diff), data=sub) +
   geom_histogram(binwidth = 0.1) + 
   scale_x_log10() +
   geom_vline(xintercept = mean(sub$interest_diff)) +
-  geom_vline(xintercept = median(sub$interest_diff), linetype=1, color='blue') +
-  geom_vline(xintercept = quantile(sub$interest_diff, probs=0.1), linetype=2, color='blue') +
-  geom_vline(xintercept = quantile(sub$interest_diff, probs=0.9), linetype=2, color='blue')
+  geom_vline(xintercept = median(sub$interest_diff), 
+             linetype=1, color='blue') +
+  geom_vline(xintercept = quantile(sub$interest_diff, probs=0.1), 
+             linetype=2, color='blue') +
+  geom_vline(xintercept = quantile(sub$interest_diff, probs=0.9), 
+             linetype=2, color='blue')
 
 
 ggplot(aes(x=interest_diff, color=actualTerm_f),  
@@ -468,7 +471,7 @@ ggplot(aes(x=interest_diff, color=actualTerm_f),
 
 
 ggplot(aes(x=interest_diff, color=amount_f),  
-       data=subset(loanData, LoanStatus == 'Completed' & interest_diff >= 0)) + 
+       data=subset(loanData, LoanStatus == 'Completed' & interest_diff >= 0)) +
   geom_freqpoly(binwidth=0.2) + 
   scale_x_log10()
 
@@ -728,12 +731,12 @@ ggplot(aes(x=interest_diff/MonthlyAmount),
 
 
 ggplot(aes(x=actualTerm, y=interest_diff/MonthlyAmount, color=ProsperRating),  
-       data=subset(loanData, LoanStatus == 'Completed' & interest_diff >= 0)) +  
+       data=subset(loanData, LoanStatus == 'Completed' & interest_diff >= 0)) +
   geom_jitter(alpha=1/10) +
   scale_y_sqrt() 
 
 ggplot(aes(x=actualTerm, y=interest_diff/MonthlyAmount, color=Term_f),  
-       data=subset(loanData, LoanStatus == 'Completed' & interest_diff >= 0)) +  
+       data=subset(loanData, LoanStatus == 'Completed' & interest_diff >= 0)) + 
   geom_jitter(alpha=1/10) +
   scale_y_sqrt() 
 
