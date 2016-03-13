@@ -1,7 +1,12 @@
 Prosper Loan Data Exploration by Nicole Schoen
 ========================================================
 
-```{r echo=FALSE, message=FALSE, warning=FALSE, packages}
+```{r global_options, include=FALSE} 
+knitr::opts_chunk$set(fig.width=12, fig.height=8, fig.path='Figs/', echo=FALSE, 
+                      warning=FALSE, message=FALSE)
+```
+
+```{r packages}
 # Load all of the packages that you end up using
 # in your analysis in this code chunk.
 
@@ -17,34 +22,60 @@ library(scales)
 library(memisc)
 ```
 
-```{r echo=FALSE, Load_the_Data}
+```{r Load_the_Data}
 # Load the Data
 setwd('C:\\Users\\Nicole\\Documents\\GitHub\\nano\\EDA')
 loanData <- read.csv('ProsperLoanData.csv')
 
-# Due to some changes in risk management Prosper changed its parameters for risk assessment.
-# To have consistent prosper scores and ratings I will only consider listings created after 
-# July 2009
-loanData$ListingCreationDate <- as.Date(loanData$ListingCreationDate, format = "%Y-%m-%d")
+# Due to some changes in risk management Prosper changed its parameters for 
+# risk assessment. To have consistent prosper scores and ratings I will only 
+# consider listings created after July 2009
+loanData$ListingCreationDate <- as.Date(loanData$ListingCreationDate, 
+                                        format = "%Y-%m-%d")
 loanData <- subset(loanData, ListingCreationDate > as.Date('2009-08-01'))
 
 # Transform categoric variables to factors
-loanData$listingCategory <- factor(loanData$ListingCategory..numeric., labels=c("Debt Consolidation", "Home Improvement", "Business", "Personal Loan", "Student Use", "Auto", "Other", "Baby&Adoption", "Boat", "Cosmetic Procedure", "Engagement Ring", "Green Loans", "Household Expenses", "Large Purchases", "Medical/Dental", "Motorcycle", "RV", "Taxes", "Vacation", "Wedding Loans"))
+loanData$listingCategory <- factor(loanData$ListingCategory..numeric., 
+                                   labels=c("Debt Consolidation", 
+                                            "Home Improvement", 
+                                            "Business", "Personal Loan", 
+                                            "Student Use", "Auto", "Other", 
+                                            "Baby&Adoption", "Boat", 
+                                            "Cosmetic Procedure", 
+                                            "Engagement Ring", "Green Loans", 
+                                            "Household Expenses", 
+                                            "Large Purchases", 
+                                            "Medical/Dental", "Motorcycle", 
+                                            "RV", "Taxes", "Vacation", 
+                                            "Wedding Loans"))
 
-# Reduce LoanStatus levels (all past dues -> Past Due and FinalPymentInProgress -> Completed)
+# Reduce LoanStatus levels 
+# (all past dues -> Past Due and FinalPymentInProgress -> Completed)
 loanData$LoanStatus_red <- loanData$LoanStatus 
-levels(loanData$LoanStatus_red) <- c("Cancelled", "Chargedoff", "Completed", "Current", "Defaulted","Completed", "Past Due", "Past Due", "Past Due", "Past Due", "Past Due", "Past Due")
-# Reorder the reduced LoanStatus levels 
-loanData$LoanStatus_red <- factor(loanData$LoanStatus_red, levels=c("Current", "Completed", "Past Due", "Chargedoff", "Defaulted", "Cancelled"))
+levels(loanData$LoanStatus_red) <- c("Cancelled", "Chargedoff", "Completed", 
+                                     "Current", "Defaulted","Completed", 
+                                     "Past Due", "Past Due", "Past Due", 
+                                     "Past Due", "Past Due", "Past Due")
 
-# Calculate difference of ClosedDate and LoanOriginationDate (actual term of the loan) 
-loanData$LoanOriginationDate <- as.Date(loanData$LoanOriginationDate, format = "%Y-%m-%d")
+# Reorder the reduced LoanStatus levels 
+loanData$LoanStatus_red <- factor(loanData$LoanStatus_red, 
+                                  levels=c("Current", "Completed", "Past Due",
+                                           "Chargedoff", "Defaulted", 
+                                           "Cancelled"))
+
+# Calculate difference of ClosedDate and LoanOriginationDate 
+# (actual term of the loan) 
+loanData$LoanOriginationDate <- as.Date(loanData$LoanOriginationDate, 
+                                        format = "%Y-%m-%d")
 loanData$ClosedDate <- as.Date(loanData$ClosedDate, format = "%Y-%m-%d")
 # Drop rows which contain inconsistent data (ClosedDate < OriginationDate)
 #table(loanData$ClosedDate > loanData$LoanOriginationDate)
-loanData <- subset(loanData, !loanData$ClosedDate < loanData$LoanOriginationDate | is.na(loanData$ClosedDate))
-getDateDiff <- function(x,y) if (is.na(y)) NA else length(seq(x, y, "month"))
-loanData$actualTerm <- mapply(getDateDiff, loanData$LoanOriginationDate, loanData$ClosedDate)
+loanData <- subset(loanData, !ClosedDate < LoanOriginationDate 
+                   | is.na(loanData$ClosedDate))
+getDateDiff <- function(x,y) 
+                  if (is.na(y)) NA else length(seq(x, y, "month"))
+loanData$actualTerm <- mapply(getDateDiff, loanData$LoanOriginationDate, 
+                              loanData$ClosedDate)
 
 # Reorder LoanOriginationQuarter (by year and by quarter)
 x <- strsplit(levels(loanData$LoanOriginationQuarter), " ")
@@ -52,53 +83,98 @@ df <- data.frame(matrix(unlist(x), ncol=2, byrow=T),stringsAsFactors=FALSE)
 df <- df[with(df, order(X2)), ]
 df <- cbind(quarter = do.call(paste, df[c('X1','X2')]), df)
 #df$quarter
-loanData$LoanOriginationQuarter <- factor(loanData$LoanOriginationQuarter, levels=df$quarter)
+loanData$LoanOriginationQuarter <- factor(loanData$LoanOriginationQuarter, 
+                                          levels=df$quarter)
 
 #Reorder IncomeRange
 #head(loanData$IncomeRange)
-loanData$IncomeRange <- factor(loanData$IncomeRange, levels=c("Not employed", "$0", "$1-24,999", "$25,000-49,999", "$50,000-74,999", "$75,000-99,999", "$100,000+", "Not displayed"))
+loanData$IncomeRange <- factor(loanData$IncomeRange, 
+                               levels=c("Not employed", "$0", "$1-24,999", 
+                                        "$25,000-49,999", "$50,000-74,999", 
+                                        "$75,000-99,999", "$100,000+", 
+                                        "Not displayed"))
 
 # Create variable year in which the loan originated
 loanData$OriginationYear <- format(loanData$LoanOriginationDate,'%Y')
 #table(loanData$OriginationYear)
                                           
-# Convert Term, ProsperScore and ProsperRating to factors as I want to use them as categorical variables
+# Convert Term, ProsperScore and ProsperRating to factors as I want to use 
+# them as categorical variables
 loanData$ProsperScore <- factor(loanData$ProsperScore)
-loanData$ProsperRating <- factor(loanData$ProsperRating..Alpha., levels=c('AA', 'A', 'B', 'C', 'D', 'E', 'HR'))
+loanData$ProsperRating <- factor(loanData$ProsperRating..Alpha., 
+                                 levels=c('AA', 'A', 'B', 'C', 'D', 'E', 'HR'))
 loanData$Term_f <- factor(loanData$Term)
 
 # Create a categrocal variable for the loan amount
-loanData$amount_f <- cut(loanData$LoanOriginalAmount, breaks=c(999, 3000, 4000, 9000, 12000, 15000 ,35000))
+loanData$amount_f <- cut(loanData$LoanOriginalAmount, 
+                         breaks=c(999, 3000, 4000, 9000, 12000, 15000 ,35000))
 #table(loanData$amount_f)
 
 
 # SELECTING COLUMNS FOR EXPLORATION
 # Group columns, so I can pull in related column groups easily if needed
-not_needed <- c("CreditGrade","Recommendations","InvestmentFromFriendsCount","InvestmentFromFriendsAmount", "BorrowerAPR", "BorrowerRate", "CurrentlyInGroup", "GroupKey", "DateCreditPulled", "ScorexChangeAtTimeOfListing", "LoanOriginationDate", "LoanOriginationQuarter", "ListingKey", "ListingNumber", "ListingCreationDate", "ListingCategory..numeric.", "ProsperRating..numeric.", "ProsperRating..Alpha.", "LoanKey", "LoanNumber", "MemberKey")
+not_needed <- c("CreditGrade","Recommendations","InvestmentFromFriendsCount",
+                "InvestmentFromFriendsAmount", "BorrowerAPR", "BorrowerRate", 
+                "CurrentlyInGroup", "GroupKey", "DateCreditPulled", 
+                "ScorexChangeAtTimeOfListing", "LoanOriginationDate", 
+                "LoanOriginationQuarter", "ListingKey", "ListingNumber", 
+                "ListingCreationDate", "ListingCategory..numeric.", 
+                "ProsperRating..numeric.", "ProsperRating..Alpha.", "LoanKey", 
+                "LoanNumber", "MemberKey")
+  
+loan <- c("Term_f", "LoanStatus", "ClosedDate", "LoanCurrentDaysDelinquent", 
+          "LoanFirstDefaultedCycleNumber", "LoanMonthsSinceOrigination", 
+          "LoanOriginationDate", "LoanOriginationQuarter", 
+          "MonthlyLoanPayment", "LoanOriginalAmount", "PercentFunded", 
+          "Investors", "listingCategory")
 
-loan <- c("Term_f", "LoanStatus", "ClosedDate", "LoanCurrentDaysDelinquent", "LoanFirstDefaultedCycleNumber", "LoanMonthsSinceOrigination", "LoanOriginationDate", "LoanOriginationQuarter", "MonthlyLoanPayment", "LoanOriginalAmount", "PercentFunded", "Investors", "listingCategory")
+LP <- c("LP_CustomerPrincipalPayments", "LP_InterestandFees", 
+        "LP_ServiceFees", "LP_CollectionFees", "LP_GrossPrincipalLoss", 
+        "LP_NetPrincipalLoss", "LP_NonPrincipalRecoverypayments", 
+        "LP_CustomerPayments")
 
-LP <- c("LP_CustomerPrincipalPayments", "LP_InterestandFees", "LP_ServiceFees",                     "LP_CollectionFees", "LP_GrossPrincipalLoss", "LP_NetPrincipalLoss", "LP_NonPrincipalRecoverypayments", "LP_CustomerPayments")
+prev_prosper_counts <- c("TotalProsperLoans","TotalProsperPaymentsBilled", 
+                         "OnTimeProsperPayments", 
+                         "ProsperPaymentsLessThanOneMonthLate", 
+                         "ProsperPaymentsOneMonthPlusLate", 
+                         "ProsperPrincipalBorrowed", 
+                         "ProsperPrincipalOutstanding") 
 
-prev_prosper_counts <- c("TotalProsperLoans","TotalProsperPaymentsBilled", "OnTimeProsperPayments", "ProsperPaymentsLessThanOneMonthLate", "ProsperPaymentsOneMonthPlusLate", "ProsperPrincipalBorrowed", "ProsperPrincipalOutstanding") 
+borrower_provided <- c("BorrowerState", "Occupation", "EmploymentStatus", 
+                       "EmploymentStatusDuration", "IsBorrowerHomeowner", 
+                       "DebtToIncomeRatio", "IncomeRange", "IncomeVerifiable",
+                       "StatedMonthlyIncome")
 
-borrower_provided <- c("BorrowerState", "Occupation", "EmploymentStatus", "EmploymentStatusDuration", "IsBorrowerHomeowner", "DebtToIncomeRatio", "IncomeRange", "IncomeVerifiable", "StatedMonthlyIncome")
+creditInfo <- c("CreditScoreRangeLower","CreditScoreRangeUpper", 
+                "FirstRecordedCreditLine", "CurrentCreditLines", 
+                "OpenCreditLines", "TotalCreditLinespast7years", 
+                "OpenRevolvingAccounts",  "OpenRevolvingMonthlyPayment", 
+                "InquiriesLast6Months", "TotalInquiries", 
+                "CurrentDelinquencies", "AmountDelinquent", 
+                "DelinquenciesLast7Years", "PublicRecordsLast10Years", 
+                "PublicRecordsLast12Months", "RevolvingCreditBalance", 
+                "BankcardUtilization", "AvailableBankcardCredit", 
+                "TotalTrades", "TradesNeverDelinquent..percentage.", 
+                "TradesOpenedLast6Months")
 
-creditInfo <- c("CreditScoreRangeLower","CreditScoreRangeUpper", "FirstRecordedCreditLine", "CurrentCreditLines", "OpenCreditLines", "TotalCreditLinespast7years", "OpenRevolvingAccounts",  "OpenRevolvingMonthlyPayment", "InquiriesLast6Months", "TotalInquiries", "CurrentDelinquencies", "AmountDelinquent", "DelinquenciesLast7Years", "PublicRecordsLast10Years", "PublicRecordsLast12Months", "RevolvingCreditBalance", "BankcardUtilization", "AvailableBankcardCredit", "TotalTrades", "TradesNeverDelinquent..percentage.", "TradesOpenedLast6Months")
-
-prosper_assessment <- c("LenderYield", "EstimatedEffectiveYield", "EstimatedLoss", "EstimatedReturn",  "ProsperScore", "ProsperRating", "BorrowerAPR", "BorrowerRate")
+prosper_assessment <- c("LenderYield", "EstimatedEffectiveYield", 
+                        "EstimatedLoss", "EstimatedReturn",  "ProsperScore", 
+                        "ProsperRating", "BorrowerAPR", "BorrowerRate")
 
 ```
 
 # Univariate Plots Section
-```{r echo=FALSE, Univariate_Plots_loan_Amount}
+```{r Univariate_Plots_loan_Amount}
 
 summary(subset(loanData, select=c(loan)))
 
-ggplot(aes(x=LoanOriginalAmount), data=loanData) + geom_histogram(binwidth = 1000)
+ggplot(aes(x=LoanOriginalAmount), data=loanData) + 
+  geom_histogram(binwidth = 1000)
+
 table(loanData$LoanOriginalAmount <= 15000)
 
-ggplot(aes(x=LoanStatus, y = (..count..)/sum(..count..)), data=loanData) + geom_bar() +
+ggplot(aes(x=LoanStatus, y = (..count..)/sum(..count..)), data=loanData) + 
+  geom_bar() +
   theme(axis.text.x = element_text(angle=90))
 
 # Add time information
@@ -124,7 +200,8 @@ ggplot(aes(x=LoanOriginationDate), data=loanData) +
 #Investigate number of investors
 ggplot(aes(x=Investors), data=loanData) + 
   geom_histogram(binwidth = 1) +
-  coord_cartesian(ylim=c(0,1000), xlim=c(0,600)) #+
+  coord_cartesian(ylim=c(0,1000), xlim=c(0,600))
+
 summary(loanData$Investors)
 table(subset(loanData, Investors <= 10)$Investors)
 
@@ -135,8 +212,6 @@ ggplot(aes(x=LoanOriginalAmount), data=single_invest) +
   ggtitle("Histogram of loan amount for loans with a single investor")
 
 summary(single_invest$LoanOriginalAmount)
-
-
 ```
 
 Most of the loans are spent on home improvement. The amount ranges from 1000 to 35000$ ( median = 7500$ ), while most of the loans have an amount of up to 15000$ (where 500$ , 1000$ and 15000$ are most common). 
@@ -150,30 +225,38 @@ But we can see, that single investors are common among all loan amounts.
 
 
 
-```{r echo=FALSE, Univariate_Plots_LP}
+```{r Univariate_Plots_LP}
 completed <- subset(loanData, LoanStatus == 'Completed')
 dim(completed)
 summary(subset(completed, select=c(LP)))
 
 # consistency check: LoanOriginalAmount and LP_CustomerPayments equal?
-ggplot(aes(x=LoanOriginalAmount, y=LP_CustomerPrincipalPayments), data=completed) + 
+ggplot(aes(x=LoanOriginalAmount, y=LP_CustomerPrincipalPayments), 
+       data=completed) + 
   geom_jitter(alpha=1/5) 
 
-# Check outliers where LoanOriginalAmount and LP_CustomerPayments do not match although laon is completed
-sub <- (subset(completed, abs(LoanOriginalAmount - LP_CustomerPrincipalPayments) > 1))
+# Check outliers where LoanOriginalAmount and LP_CustomerPayments do not match 
+# although laon is completed
+sub <- (subset(completed, 
+               abs(LoanOriginalAmount - LP_CustomerPrincipalPayments) > 1))
 dim(sub)
-sub$diff <- cut(sub$LoanOriginalAmount - sub$LP_CustomerPrincipalPayments, c(-15000, -1000, -100, -10, 10, 100, 1000, 15000))
+sub$diff <- cut(sub$LoanOriginalAmount - sub$LP_CustomerPrincipalPayments, 
+                c(-15000, -1000, -100, -10, 10, 100, 1000, 15000))
 summary(sub$diff)
 
 # Check relation between PercentFunded and LoanOriginalAmount
 partial <- subset(completed, PercentFunded < 1)
 partial$LoanOriginalAmount / partial$PercentFunded
 
-# consistency check: LP_CustomerPayments = LP_CustomerPrincipalPayments + LP_InterestandFees
-ggplot(aes(x=LP_CustomerPayments, y=LP_CustomerPrincipalPayments + LP_InterestandFees), data=loanData) + 
+# consistency check: 
+# LP_CustomerPayments = LP_CustomerPrincipalPayments + LP_InterestandFees
+ggplot(aes(x=LP_CustomerPayments, 
+           y=LP_CustomerPrincipalPayments + LP_InterestandFees), 
+       data=loanData) + 
   geom_jitter(alpha=1/5) 
 
-dim(subset(loanData, abs(LP_CustomerPrincipalPayments + LP_InterestandFees - LP_CustomerPayments) > 1))
+dim(subset(loanData, abs(LP_CustomerPrincipalPayments + 
+                           LP_InterestandFees - LP_CustomerPayments) > 1))
 
 ```
 
@@ -183,7 +266,7 @@ The percent funded is already incorporated in LoanOriginalAmount. This amount is
 LP_CustomerPayments = LP_CustomerPrincipalPayments + LP_InterestandFees holds for all loans, no outliers here.
 
 
-```{r echo=FALSE, Univariate_Plots_income}
+```{r Univariate_Plots_income}
 
 summary(subset(loanData, select=c(borrower_provided)))
 
@@ -205,7 +288,8 @@ ggplot(aes(x=StatedMonthlyIncome),
 # print outliers
 subset(loanData, StatedMonthlyIncome > 100000)$StatedMonthlyIncome
 
-ggplot(aes(x=StatedMonthlyIncome, color=LoanStatus_red), data=subset(loanData, StatedMonthlyIncome < 
+ggplot(aes(x=StatedMonthlyIncome, color=LoanStatus_red), 
+       data=subset(loanData, StatedMonthlyIncome < 
                      quantile(loanData$StatedMonthlyIncome,probs=0.99))) +  
   geom_freqpoly(aes(y = (..count..)/sum(..count..)), binwidth=500) 
 
@@ -224,7 +308,7 @@ When breaking out by loan status we see that the income distributions for each l
 Note that 12185 borrowers have or had multiple loans in the time between 2009 and 2014.  
 
 
-```{r echo=FALSE, Univariate_Plots_lender_yield}
+```{r Univariate_Plots_lender_yield}
 
 summary(subset(loanData, select=c(prosper_assessment)))
 summary(subset(loanData, select=c(LP)))
@@ -249,11 +333,14 @@ cor.test(x=as.numeric(loanData$ProsperScore), y=loanData$EstimatedLoss)
 ggplot(aes(x=CreditScoreRangeLower, y=ProsperRating), data=loanData) + 
   geom_jitter(alpha=1/20) +
   facet_wrap(~OriginationYear)
-cor.test(x=as.numeric(loanData$CreditScoreRangeUpper), y=loanData$EstimatedLoss)
+cor.test(x=as.numeric(loanData$CreditScoreRangeUpper), 
+         y=loanData$EstimatedLoss)
 
 
 ###########  
-ggplot(aes(x=LP_GrossPrincipalLoss, fill=ProsperRating), data=subset(loanData, LP_GrossPrincipalLoss > 0)) +   geom_histogram() +
+ggplot(aes(x=LP_GrossPrincipalLoss, fill=ProsperRating), 
+       data=subset(loanData, LP_GrossPrincipalLoss > 0)) +
+  geom_histogram() +
   facet_wrap(~LoanOriginationQuarter)
 
 #loanData$ClosedYear <- format(loanData$ClosedDate, "%Y %m")
@@ -275,7 +362,8 @@ ggplot(aes(x=LP_GrossPrincipalLoss, fill=ProsperRating), data=subset(loanData, L
 #      theme(axis.text.x = element_text(angle=90))
 
 
-ggplot(aes(x=LP_GrossPrincipalLoss, y=LP_NetPrincipalLoss), data=subset(loanData, LP_GrossPrincipalLoss > 0)) + 
+ggplot(aes(x=LP_GrossPrincipalLoss, y=LP_NetPrincipalLoss), 
+       data=subset(loanData, LP_GrossPrincipalLoss > 0)) + 
   geom_point() 
 
 ggplot(aes(x=EstimatedEffectiveYield, color=ProsperRating), data=loanData) + 
@@ -295,13 +383,14 @@ Prosper uses an agency score and calcualates a ProsperScore. In addition there i
 ProsperScore and ProsperRating seem to be correlated, as well as the ProsperRating and the agency score. When looking it up in the docu you find that the ProsperRating takes into acount the ProsperRating and the agency score together with some additional parameters. 
 What is intersting is that in 2014 it looks like Prosper increased the minimum agency score that a borrower must have to be allowed to apply for a Prosper loan. Might be that this is also related to the more balanced distribution of lender yield.  
 
-```{r echo=FALSE, Univariate_Plots_actual_term}
+```{r Univariate_Plots_actual_term}
 
 ggplot(aes(x=ClosedDate), data=subset(loanData, !is.na(ClosedDate))) + 
   geom_histogram(binwidth=10) +
   scale_x_date()
 
-ggplot(aes(x=ClosedDate, color=LoanStatus_red), data=subset(loanData, !is.na(ClosedDate))) + 
+ggplot(aes(x=ClosedDate, color=LoanStatus_red), 
+       data=subset(loanData, !is.na(ClosedDate))) + 
   geom_freqpoly(binwidth=10) +
   scale_x_date()
 
@@ -309,7 +398,8 @@ ggplot(aes(x=LoanOriginationDate, color=Term), data=loanData) +
   geom_freqpoly(binwidth=50) +
   scale_x_date() 
 
-ggplot(aes(x=actualTerm, color=LoanStatus_red), data=subset(loanData, !is.na(actualTerm))) + 
+ggplot(aes(x=actualTerm, color=LoanStatus_red), 
+       data=subset(loanData, !is.na(actualTerm))) + 
   geom_freqpoly(aes(y=(..count..)/sum(..count..)), binwidth=1) + 
   geom_vline(xintercept=12, alpha=0.3, linetype=2) + 
   geom_vline(xintercept=36, linetype=2, alpha=0.3) + 
@@ -318,7 +408,8 @@ ggplot(aes(x=actualTerm, color=LoanStatus_red), data=subset(loanData, !is.na(act
 summary(loanData$Term_f)
 summary(loanData$actualTerm)
 
-loanData_sub <- subset(loanData, !is.na(actualTerm)  & LoanStatus == 'Completed')
+loanData_sub <- subset(loanData, !is.na(actualTerm) & 
+                         LoanStatus == 'Completed')
 
 ggplot(aes(x=actualTerm / Term), data=loanData_sub) +
   geom_histogram(binwidth=0.05)
@@ -337,7 +428,7 @@ Looks like many loans are payed back early. Loan periods are 12, 36 and 60 month
 When calculating the ratio of the indicated term and the actual difference between origination and close date we see that the majority is repayed a few or even many months before its term ends (22791 out of 25820). And that seems to be true for older as well as for newer loans. 
 
 
-```{r echo=FALSE, Calculate_actual_lender_yield}
+```{r Calculate_actual_lender_yield}
 
 n <- 12
 #i <- loanData$BorrowerRate
@@ -348,9 +439,11 @@ q <- 1 + i / n
 
 loanData$actualTerm_f <- cut(loanData$actualTerm, seq(0,60,5))
 table(loanData$actualTerm_f)
-loanData$MonthlyAmount <- round(K * q^t * (q-1)/(q^t - 1),2)
-loanData$interest_exp <- loanData$MonthlyAmount * loanData$Term - loanData$LoanOriginalAmount
-loanData$interest_diff <- loanData$interest_exp - (loanData$LP_InterestandFees) 
+loanData$MonthlyAmount <- round(K * q^t * (q-1) / (q^t - 1),2)
+loanData$interest_exp <- loanData$MonthlyAmount * loanData$Term - 
+                            loanData$LoanOriginalAmount
+loanData$interest_diff <- loanData$interest_exp - 
+                            (loanData$LP_InterestandFees) 
 
 ggplot(aes(x=interest_diff),  
        data=subset(loanData, LoanStatus == 'Completed')) + 
@@ -358,10 +451,15 @@ ggplot(aes(x=interest_diff),
 
 summary(loanData$interest_diff)
 
-ggplot(aes(x=interest_diff),  
-       data=subset(loanData, LoanStatus == 'Completed' & interest_diff >= 0)) + 
-  geom_histogram(binwidth = 0.1)+ 
-  scale_x_log10()
+sub <- subset(loanData, LoanStatus == 'Completed' & interest_diff >= 0)
+ggplot(aes(x=interest_diff), data=sub) + 
+  geom_histogram(binwidth = 0.1) + 
+  scale_x_log10() +
+  geom_vline(xintercept = mean(sub$interest_diff)) +
+  geom_vline(xintercept = median(sub$interest_diff), linetype=1, color='blue') +
+  geom_vline(xintercept = quantile(sub$interest_diff, probs=0.1), linetype=2, color='blue') +
+  geom_vline(xintercept = quantile(sub$interest_diff, probs=0.9), linetype=2, color='blue')
+
 
 ggplot(aes(x=interest_diff, color=actualTerm_f),  
        data=subset(loanData, LoanStatus == 'Completed' & interest_diff >= 0)) + 
@@ -376,7 +474,8 @@ ggplot(aes(x=interest_diff, color=amount_f),
 
 
 #quantile(loanData$LoanOriginalAmount, probs=seq(0,1,0.2))
-loanData$amount_f <- cut(loanData$LoanOriginalAmount, breaks=c(999, 4000,5250, 10000, 15000, 35000))
+loanData$amount_f <- cut(loanData$LoanOriginalAmount, 
+                         breaks=c(999, 4000,5250, 10000, 15000, 35000))
 table(loanData$amount_f)
 
 ggplot(aes(x=interest_diff, color=Term_f),  
@@ -448,7 +547,7 @@ When I calculated the difference between CloseDate and LoanOriginationDate I fou
 I found that the interest difference (expected (ideal) amount of interest - actual amount of interest) has a very long tail,so I tried a log transformation which leads to a more normal distribution of the data with a mean around 1000.  
 
 # Bivariate Plots Section
-```{r echo=FALSE, message=FALSE, warning=FALSE, Bivariate_Plots_Lender_Yield}
+```{r Bivariate_Plots_Lender_Yield}
 
 ggplot(aes(x=LoanOriginationQuarter, y=LenderYield), data=loanData) + 
   geom_boxplot() +
@@ -460,7 +559,8 @@ ggplot(aes(x=LoanOriginationQuarter, y=LenderYield), data=loanData) +
   stat_summary(fun.y=mean, geom='point', shape=4) +
   theme(axis.text.x = element_text(angle=90))
 
-ggplot(aes(x=EstimatedLoss, y=LoanOriginalAmount, color=ProsperScore), data=loanData) + 
+ggplot(aes(x=EstimatedLoss, y=LoanOriginalAmount, color=ProsperScore), 
+       data=loanData) + 
   geom_point(alpha = 0.5, position = 'jitter') +
   facet_wrap(~OriginationYear, scales="free_x")
 
@@ -492,36 +592,48 @@ In 2012/13 we have 3 separate 'lines', wondering were this comes from. It seems 
 
 The loan amount also seems to determine the lender yield in a way. But this seems to be more related to the Prosper Score of the borrower. With lower a Prosper Score a borrower can only apply for lower amounts. At least this pattern emerges starting in 2011 to be become pretty clear in 2014.  
 
-```{r echo=FALSE, message=FALSE, warning=FALSE, Bivariate_Plots_Interest_difference}
+```{r Bivariate_Plots_Interest_difference}
 
 
 set.seed(20160115)
 
-columns <- c("interest_diff", "ProsperRating", "LenderYield", "actualTerm", "Term_f", "LoanOriginalAmount", "DebtToIncomeRatio", "StatedMonthlyIncome")
+columns <- c("interest_diff", "ProsperRating", "LenderYield", "actualTerm", 
+             "Term_f", "LoanOriginalAmount", "DebtToIncomeRatio", 
+             "StatedMonthlyIncome")
 samp <- sample_n(subset(loanData, LoanStatus="Completed")[,columns], 10000)
-ggpairs_p <- wrap_fn_with_param_arg(ggpairs, params = c(shape = I('.'), outlier.shape = I('.')))
+ggpairs_p <- wrap_fn_with_param_arg(ggpairs, 
+                                    params = c(shape = I('.'), 
+                                    outlier.shape = I('.')))
 ggpairs_p(samp,mapping=NULL, axisLabels = 'internal')
 
 ggplot(aes(x=LoanOriginalAmount, y=interest_diff, color=Term_f),  
-       data=subset(loanData, LoanStatus == 'Completed')) +  geom_jitter(alpha=1/5) 
+       data=subset(loanData, LoanStatus == 'Completed')) +  
+  geom_jitter(alpha=1/5) +
+  geom_smooth()
 
 ggplot(aes(x=LoanOriginalAmount, y=interest_diff, color=actualTerm_f),  
-       data=subset(loanData, LoanStatus == 'Completed')) +  geom_jitter() +
-  scale_color_brewer(type = 'div',
-                     guide = guide_legend(override.aes = list(alpha = 1, size = 2)))
+       data=subset(loanData, LoanStatus == 'Completed')) +  
+  geom_jitter() +
+  scale_color_brewer(type = 'div', 
+                     guide = guide_legend(
+                       override.aes = list(alpha = 1, size = 2)))
 
 
 ggplot(aes(x=actualTerm, y=interest_diff),  
-       data=subset(loanData, LoanStatus == 'Completed')) +  geom_jitter(alpha=1/10) 
+       data=subset(loanData, LoanStatus == 'Completed')) +  
+  geom_jitter(alpha=1/10) 
 
 ggplot(aes(x=actualTerm, y=interest_diff, color= Term_f),  
-       data=subset(loanData, LoanStatus == 'Completed')) +  geom_jitter(alpha=1/10) 
+       data=subset(loanData, LoanStatus == 'Completed')) +  
+  geom_jitter(alpha=1/20) +
+  geom_line(stat='summary', fun.y=mean) 
 
 ggplot(aes(x=actualTerm, y=interest_diff, color=amount_f),  
        data=subset(loanData, LoanStatus == 'Completed')) + 
   geom_point(size = 2, position = 'jitter') +
-  scale_color_brewer(type = 'div',
-                     guide = guide_legend(override.aes = list(alpha = 1, size = 2))) 
+  scale_color_brewer(type = 'div', 
+                     guide = guide_legend(
+                       override.aes = list(alpha = 1, size = 2))) 
 
 
 ggplot(aes(x=LenderYield, y=interest_diff),  
@@ -554,36 +666,43 @@ The relationship between lender yield and estimated loss in the years 2012 - 201
 
 # Multivariate Plots Section
 
-```{r echo=FALSE, warning=FALSE, Multivariate_Plots}
+```{r Multivariate_Plots}
 
 ggplot(aes(x=LoanOriginalAmount, y=interest_diff, color=ProsperRating),  
-       data=subset(loanData, LoanStatus == 'Completed'  & interest_diff >=0)) +  geom_jitter() +
-  scale_color_brewer(type = 'div',
-                     guide = guide_legend(override.aes = list(alpha = 1, size = 2))) +
+       data=subset(loanData, LoanStatus == 'Completed'  & interest_diff >=0)) + 
+  geom_jitter() +
+  scale_color_brewer(type = 'div', 
+                     guide = guide_legend(
+                                override.aes = list(alpha = 1, size = 2))) +
   scale_y_log10()
 
 
 ggplot(aes(x=LoanOriginalAmount, y=interest_diff, color=actualTerm_f),  
-       data=subset(loanData, LoanStatus == 'Completed')) +  geom_jitter() +
-  scale_color_brewer(type = 'div',
-                     guide = guide_legend(override.aes = list(alpha = 1, size = 2))) +
+       data=subset(loanData, LoanStatus == 'Completed')) +  
+  geom_jitter() +
+  scale_color_brewer(type = 'div', 
+                     guide = guide_legend(
+                                override.aes = list(alpha = 1, size = 2))) +
   scale_y_log10()
 
 ggplot(aes(x=actualTerm, y=interest_diff),  
-       data=subset(loanData, LoanStatus == 'Completed')) +  geom_jitter(alpha=1/10) +
-  scale_y_log10() 
+       data=subset(loanData, LoanStatus == 'Completed')) +  
+  geom_jitter(alpha=1/10, color='orange') +
+  scale_y_log10() +
+  geom_line(stat='summary', fun.y=mean) 
 
 ggplot(aes(x=actualTerm, y=interest_diff, color=amount_f),  
-       data=subset(loanData, LoanStatus == 'Completed' & interest_diff >= 0)) +  
+       data=subset(loanData, LoanStatus == 'Completed' & interest_diff >= 0)) + 
   geom_jitter() +
   scale_y_log10() +
-  scale_color_brewer(type = 'div',
-                     guide = guide_legend(override.aes = list(alpha = 1, size = 2))) 
+  scale_color_brewer(type = 'div', guide = 
+                       guide_legend(override.aes = list(alpha = 1, size = 2))) 
 
 ggplot(aes(x=actualTerm, y=interest_diff, color=Term_f),  
-       data=subset(loanData, LoanStatus == 'Completed' & interest_diff >= 0)) +  
+       data=subset(loanData, LoanStatus == 'Completed' & interest_diff >= 0)) +
   geom_jitter() +
-  scale_y_log10() 
+  scale_y_log10() +
+  geom_smooth()
 
 
 ggplot(aes(x=actualTerm, y=interest_diff/MonthlyAmount),  
@@ -618,10 +737,17 @@ ggplot(aes(x=actualTerm, y=interest_diff/MonthlyAmount, color=Term_f),
   geom_jitter(alpha=1/10) +
   scale_y_sqrt() 
 
+ggplot(aes(x=actualTerm, y=interest_diff/LoanOriginalAmount * 100, 
+       color=ProsperRating),  
+       data=subset(loanData, LoanStatus == 'Completed' & interest_diff > 1)) +  
+  geom_jitter() +
+  scale_y_sqrt() +
+  facet_wrap(~Term_f, ncol=1, scales="free") +
+  geom_smooth()
 
 
-
-m1 <- lm(LenderYield ~ EstimatedLoss, data = subset(loanData, OriginationYear > 2010))
+m1 <- lm(LenderYield ~ EstimatedLoss, 
+         data = subset(loanData, OriginationYear > 2010))
 m2 <- update(m1, ~ . + Term_f)
 #m3 <- update(m2, ~ . + DebtToIncomeRatio)
 #m3 <- update(m2, ~ . + LoanOriginalAmount)
@@ -632,7 +758,8 @@ plot(m2, which = 1:2)
 
 
 sub1 <- subset(loanData, LoanStatus == 'Completed' & interest_diff >= 0)
-m1 <- lm(I(sqrt(sub1$interest_diff/sub1$MonthlyAmount)) ~ ProsperRating - 1 , data = sub1)
+m1 <- lm(I(sqrt(sub1$interest_diff/sub1$MonthlyAmount)) ~ ProsperRating - 1, 
+         data = sub1)
 m2 <- update(m1, ~ . + Term_f)
 m3 <- update(m2, ~ . + actualTerm)
 #m4 <- update(m3, ~ . + LenderYield)
@@ -672,48 +799,85 @@ However, looking at the residuals these are not normally distributed as the QQ p
 # Final Plots and Summary
 
 ### Plot One
-```{r echo=FALSE, Plot_One}
+```{r results="hide", Plot_One}
 
 loanData$LenderYield_percent <- loanData$LenderYield * 100
-ggplot(aes(x=LenderYield_percent, y=LoanOriginalAmount, color=ProsperRating), data=loanData) + 
+
+loandData_09_11 <- subset(loanData, OriginationYear %in% c(2009,2010,2011))
+loandData_12_14 <- subset(loanData, OriginationYear %in% c(2012,2013,2014))
+cor.test(x=loandData_09_11$LenderYield, y=loandData_09_11$EstimatedLoss)
+cor.test(x=loandData_12_14$LenderYield, y=loandData_12_14$EstimatedLoss)
+summary(subset(loandData_09_11, ProsperRating == 'HR')$LenderYield)
+mean(subset(loandData_09_11, ProsperRating == 'HR')$LenderYield)
+
+summary(subset(loandData_12_14, ProsperRating == 'HR')$LenderYield)
+
+
+ggplot(aes(x=LenderYield_percent, y=LoanOriginalAmount, color=ProsperRating), 
+       data=loanData) + 
   geom_point(alpha = 0.5, position = 'jitter') +
   facet_wrap(~OriginationYear) +
   xlab("Lender Yield [in %]") +
   ylab("Loan Amount [in $]") +
-  ggtitle("How Lender Yield and Maximum Loan Amount become more aligned with the Prosper Rating from 2009 to 2014") +
+  ggtitle("How Lender Yield and Maximum Loan Amount become more aligned with 
+          the Prosper Rating from 2009 to 2014") +
   guides(color=guide_legend(title="Prosper Rating"))
+
+
 
 ```
 
 ### Description One
-The plot shows how Prosper aligned the Lender Yield with the risk associated with a loan according to the Prosper Rating. At the same time we can see how the maximum amount that a borrower can apply for is more an more adjusted to the associated risk. In 2014 a borrower with a better rating can apply for higher loans.  
+The plot shows how Prosper aligs the Lender Yield and the risk associated with a loan more stricly over the years. As an example in the 2009-2011 timeframe there exist loans rated as 'High-Risk' which were assigned a Lender Yield of as low as 16.8% and up to 34% (median was already 30%), while in 2012-2014 the range reduced to only 27.7-30.7%. This is also reflected in the correlation. In the years 2009-2011 lender there already exists a strong correlation between Estimated Loss and Lender Yield (0.89), however it becomes almost perfect in the years 2012-2014 (0.97). 
+Furthermore one can oberserve how the maximum amount that a borrower can apply for is more and more adjusted to the loan's associated risk. While in 2009-2010 there is no clear gradation, in 2011 only loans with a Prosper Rating of AA or A have a loan amount of up to \$25000. In 2012 this is extended to the B and C rated loans. Interestingly, in 2013 the maximum amount was increased to \$35000 but only for AA - B rated loans, while C rated loans stayed at a maximum of \$25000, Also the lower ratings have a specific maximum amount (D rated loans up to \$15000, E rated loans 10000$ and HR rated only \$4000). 
 
 ### Plot Two
-```{r echo=FALSE, Plot_Two}
+```{r results="hide", Plot_Two}
 
 loanData$EstimatedLoss_percent <- loanData$EstimatedLoss * 100
 
-ggplot(aes(x=LenderYield_percent, y=EstimatedLoss_percent, color=Term_f), data=loanData) + 
+#grouped mean and SD for each Prosper Rating
+loanData %>% 
+  filter(OriginationYear %in% c(2013,2014)) %>%
+  group_by(ProsperRating) %>%
+  summarise(mean_ = mean(LenderYield_percent),
+            stdev=sd(LenderYield_percent), 
+            n = n())
+
+loanData %>% 
+  filter(OriginationYear %in% c(2009)) %>%
+  group_by(ProsperRating) %>%
+  summarise(mean_ = mean(LenderYield_percent),
+            stdev=sd(LenderYield_percent), 
+            n = n())
+
+ggplot(aes(x=LenderYield_percent, y=EstimatedLoss_percent, color=Term_f), 
+       data=loanData) + 
   geom_point() +
   facet_wrap(~OriginationYear) +
   xlab("Lender Yield [in %]") +
   ylab("Estimated Loss [in %]") +
-  ggtitle("How the Lender Yield becomes more determined by the loan's associated risk and less by the agreed on repayment term") +
+  ggtitle("How the Lender Yield becomes more determined by the loan's 
+          associated risk and less by the agreed on repayment term") +
   guides(color=guide_legend(title="Repayment Term"))
 
 
 ```
 
 ### Description Two
-The plot shows how lender yield and estimated loss (the risk associated with a loan) become more aligned
-over the years. While we still see a great variance in der lender yield in 2009, we get an almost perfect linear relationship in 2014. Furthermore we can see how the repayment term becomes a less important factor when it comes to determining the borrower rate/ lender yield and in 2014 seems to loose its influence completely. 
+The plot shows how lender yield and estimated loss (the risk associated with a loan) become more aligned over the years. In 2009 we see a great variance in the lender yield which even increases for loans with a higher estimated loss. The standard deviation grouped by Prosper Rating ranges from 2.3% for AA rated loans to up to 6.5% for HR rated loans. The variance in the lender yield reduces over the years, until we have an almost perfect linear relationship in 2014. In the years 2013/2014 the standard deviation of the lender yield grouped by Prosper Rating fluctuates only between 0.66% and 1.8%. So Prosper obviously adjusted its policy for assigning interest rates to loans according to the associated risk.
+
+Furthermore we can see how the repayment term affects the lender yield that is assigned to a loan. Keeping the Estimated Loss constant we find that loans with shorter repayment term are assigned lower lender yields. This can be seen very clearly for the years 2011, 2012 and 2013. However, in 2014 the repayment term looses its effect on the lender yield. So Prosper seems to have decided to not give better interest rates for shorter loan terms any more. This fits with the observation that the majority of the loans are payed back early anyway (16623 out of 19498 completed loans).
 
 ### Plot Three
-```{r echo=FALSE, Plot_Three}
+```{r Plot_Three}
 
-loanData$Term_f <- factor(loanData$Term_f, labels=c("1-year loan term", "3-year loan term", "5-year loan term"))
+loanData$Term_f <- factor(loanData$Term_f, 
+                          labels=c("1-year loan term", "3-year loan term", 
+                                   "5-year loan term"))
 
-ggplot(aes(x=actualTerm, y=interest_diff/LoanOriginalAmount * 100, color=ProsperRating),  
+ggplot(aes(x=actualTerm, y=interest_diff/LoanOriginalAmount * 100, 
+       color=ProsperRating),  
        data=subset(loanData, LoanStatus == 'Completed' & interest_diff > 1)) +  
   geom_jitter() +
   xlab("Actual repayment period [in months]") +
@@ -722,14 +886,16 @@ ggplot(aes(x=actualTerm, y=interest_diff/LoanOriginalAmount * 100, color=Prosper
   #scale_y_log10() +
   scale_y_sqrt() +
   facet_wrap(~Term_f, ncol=1, scales="free") +
-  scale_color_brewer(type = 'div',
-                     guide = guide_legend(title="Prosper Rating", override.aes = list(alpha = 1, size = 2))) 
+  scale_color_brewer(type = 'div', 
+                     guide = guide_legend(title="Prosper Rating", 
+                     override.aes = list(alpha = 1, size = 2))) 
 
 ```
 
 ### Description Three
-The plot shows the factors that primarily determine the amount of interest relative to the loan amount that a lender can expect to not achieve due to early repayment of a loan. 
-
+This plot further investigates the effect that early repayment of a loan has on the amount of interest that a lender can expect to achieve. 
+The plot shows the factors that primarily determine the interest loss a lender can expect not to achieve due to early repayment of a loan. We look at the the amount of interest relative to the loan's amount as obviously the amount of interest depends on the borrowed amount. Further applying a Squareroot-transformation shows a negative linear relationship to the actual repayment period. 
+Holding the actual repayment period constant we get 3 groups. The 3 groups seem to perfectly align with the agreed on terms. That means holding the actual repayment period and the agreed on term constant we always have a a higher interest difference for worse propser rating. Probably because of the higher interest rate the borrower has to pay when getting a worse rating. 
 
 ------
 
